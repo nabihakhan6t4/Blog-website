@@ -1,0 +1,17 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+@import "tailwindcss";
+* {
+  font-family: "Outfit", sans-serif;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+@theme {
+  --color-primary: #5044E5; /* soft rose pink */
+  --color-secondary: #ffe6eb; /* light blush background */
+  --color-accent: #6b5b95; /* muted purple accent */
+  --color-bg: #fff7f9; /* very light pinkish white */
+  --color-text: #2c2c2c; /* deep gray for readability */
+}

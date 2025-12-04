@@ -5,7 +5,7 @@ import userLogo from "../assets/user.jpg";
 import { FaFacebook, FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Label } from "../components/ui/label";
-
+import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import {
   Dialog,
@@ -26,7 +26,7 @@ const Profile = () => {
           {/* image section */}
           <div className="flex flex-col items-center justify-center md:w-[400px] ">
             <Avatar className="w-40 h-40 border-2">
-              <AvatarImage  src={userLogo}  alt="User profile picture"/>
+              <AvatarImage src={userLogo} alt="User profile picture" />
             </Avatar>
             <h1 className="text-center font-semibold text-xl text-gray-700 dark:text-gray-300 my-3 ">
               Mern Stack Developer
@@ -68,40 +68,86 @@ const Profile = () => {
                 <Button>Edit Profile</Button>
               </DialogTrigger>
 
-              <DialogContent className="sm:max-w-[425px]">
+              <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle>Edit profile</DialogTitle>
-                  <DialogDescription>
-                    Make changes to your profile here. Click save when
-                    you&apos;re done.
+                  <DialogTitle className="text-center">
+                    Edit Profile
+                  </DialogTitle>
+                  <DialogDescription className="text-center">
+                    Update your personal details and social links.
                   </DialogDescription>
                 </DialogHeader>
 
-                <form className="space-y-4">
-                  <div className="flex gap-3">
-                    <div className="grid gap-3">
-                      <Label htmlFor="name-1">First Name</Label>
-                      <Input
-                        id="name-1"
-                        name="firstName"
-                        placeholder="First Name"
-                      />
+                <form className="space-y-5">
+                  {/* Name in One Line */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input id="firstName" placeholder="First Name" />
                     </div>
-                    <div className="grid gap-3">
-                      <Label htmlFor="username-1">Last Name</Label>
-                      <Input
-                        id="username-1"
-                        name="lastName"
-                        placeholder="Last Name"
-                      />
+
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input id="lastName" placeholder="Last Name" />
                     </div>
                   </div>
 
-                  <DialogFooter>
+                  {/* Profile Picture */}
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="picture">Profile Picture</Label>
+                    <Input
+                      id="picture"
+                      type="file"
+                      accept="image/*"
+                      className="w-[277px]"
+                    />
+                  </div>
+
+                  {/* Description */}
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="about">Description</Label>
+                    <Textarea
+                      id="about"
+                      placeholder="Tell something about yourself..."
+                      className="text-gray-600"
+                    />
+                  </div>
+
+                  {/* Social Links */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="facebook">Facebook</Label>
+                      <Input id="facebook" placeholder="Facebook URL" />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="linkedin">LinkedIn</Label>
+                      <Input id="linkedin" placeholder="LinkedIn URL" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="github">GitHub</Label>
+                      <Input id="github" placeholder="GitHub URL" />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="instagram">Instagram</Label>
+                      <Input id="instagram" placeholder="Instagram URL" />
+                    </div>
+                  </div>
+
+                  <DialogFooter className="pt-2">
                     <DialogClose asChild>
-                      <Button variant="outline">Cancel</Button>
+                      <Button variant="outline" className="w-full sm:w-auto">
+                        Cancel
+                      </Button>
                     </DialogClose>
-                    <Button type="submit">Save changes</Button>
+
+                    <Button type="submit" className="w-full sm:w-auto">
+                      Save changes
+                    </Button>
                   </DialogFooter>
                 </form>
               </DialogContent>

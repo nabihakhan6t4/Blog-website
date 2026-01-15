@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLoading, setUser } from "../redux/authSlice";
 import { toast } from "sonner";
 import axios from "axios";
+import { Loader2 } from "lucide-react";
 
 const Profile = () => {
   const [open, setOpen] = useState(false);
@@ -261,7 +262,14 @@ const Profile = () => {
                       onClick={submitHandler}
                       className="w-full sm:w-auto"
                     >
-                     {}
+                     {
+                      loading ? (
+                        <>
+                        <Loader2 className="mr-2 w-4 h-4 animate-spin"/>
+                        Please Wait
+                        </>
+                      ) : ( "Save Changes")
+                     }
                     </Button>
                   </DialogFooter>
                 </form>

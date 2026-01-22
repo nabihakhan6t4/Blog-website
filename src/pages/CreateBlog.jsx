@@ -13,7 +13,7 @@ import {
 } from "../components/ui/select";
 import { Button } from "../components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setBlog } from "../redux/blogSlice";
 import { toast } from "sonner";
@@ -27,13 +27,15 @@ const CreateBlog = () => {
   const navigate = useNavigate();
   const { blog, loading } = useSelector((store) => store.blog);
 
+  console.log(blog);
+
   const handleCreate = async () => {
     if (!title || !category) {
       toast.error("Please fill in both title and category!");
       return;
     }
     try {
-      dispatch(setLoading(TreeDeciduous));
+      dispatch(setLoading(true));
       const res = await axios.post(
         "http://localhost:8000/api/v1/blog",
         { title, category },
@@ -46,10 +48,14 @@ const CreateBlog = () => {
       );
 
       if (res.data.success) {
+        if (!blog) {
+          dispatch(setBlog([res.data.blog]));
+          toast.success(res.data.message);
+        }
         dispatch(setBlog([...blog, res.data.blog]));
         setTitle("");
         setCategory("");
-        navigate(`/dashboard/write-blog/${res.data.blog._id}`);
+        navigate(`/dashboard/create-blog/${res.data.blog._id}`);
         toast.success(res.data.message);
       } else {
         toast.error("Failed to create blog!");

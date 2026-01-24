@@ -14,13 +14,16 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading } from "../redux/authSlice";
+import axios from "axios";
+import { toast } from "sonner";
 
 const UpdateBlog = () => {
   const editorRef = useRef(null);
   const navigate = useNavigate();
   const { blogId } = useParams();
-
+  const dispatch = useDispatch();
   const { blog } = useSelector((store) => store.blog);
   const selectedBlog = blog.find((b) => b._id === blogId);
 
@@ -33,7 +36,7 @@ const UpdateBlog = () => {
   });
 
   const [thumbnailPreview, setThumbnailPreview] = useState(
-    selectedBlog?.thumbnail || ""
+    selectedBlog?.thumbnail || "",
   );
 
   // Handlers
@@ -51,7 +54,7 @@ const UpdateBlog = () => {
   };
 
   const handleThumbnailChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
       setBlogData((prev) => ({ ...prev, thumbnail: file }));
       setThumbnailPreview(URL.createObjectURL(file));
@@ -60,24 +63,34 @@ const UpdateBlog = () => {
 
   // Publish blog handler
   const updateBlogHandler = async () => {
+    const formData = new FormData();
+    formData.append("title", blogData.title);
+    formData.append("subtitle", blogData.subtitle);
+    formData.append("description", blogData.description);
+    formData.append("category", blogData.category);
+    formData.append("file", blogData.thumbnail);
     try {
-      const formData = new FormData();
-      formData.append("title", blogData.title);
-      formData.append("subtitle", blogData.subtitle);
-      formData.append("description", blogData.description);
-      formData.append("category", blogData.category);
-      if (blogData.thumbnail instanceof File) {
-        formData.append("thumbnail", blogData.thumbnail);
+      dispatch(setLoading(true));
+      const res = await axios.put(
+        `http://localhost:8000/api/v1/blog/${id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        },
+      );
+      if (res.data.success) {
+        toast.success(res.data.message);
+        console.log(blogData);
       }
 
-      // TODO: replace with your API call
-      // await axios.put(`/api/blogs/${blogId}`, formData);
-      console.log("Blog updated:", blogData);
-      alert("Blog updated successfully!");
       navigate(-1);
     } catch (error) {
       console.error("Failed to update blog:", error);
-      alert("Failed to update blog. Check console for details.");
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
@@ -85,12 +98,12 @@ const UpdateBlog = () => {
     <div className="md:ml-[320px] pt-20 px-3 pb-10">
       <div className="max-w-6xl mx-auto mt-8">
         <Card className="w-full bg-white dark:bg-gray-800 p-6 space-y-6 rounded-xl shadow-md">
-
           {/* Header */}
           <div>
             <h1 className="text-4xl font-bold">Edit Blog</h1>
             <p className="text-gray-600 dark:text-gray-300 mt-2">
-              Update your blog details below. Click <strong>Publish</strong> once you have finished editing.
+              Update your blog details below. Click <strong>Publish</strong>{" "}
+              once you have finished editing.
             </p>
           </div>
 

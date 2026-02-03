@@ -38,7 +38,7 @@ const UpdateBlog = () => {
   });
 
   const [thumbnailPreview, setThumbnailPreview] = useState(
-    selectedBlog?.thumbnail || ""
+    selectedBlog?.thumbnail || "",
   );
 
   // Handle text input changes
@@ -81,7 +81,7 @@ const UpdateBlog = () => {
         {
           headers: { "Content-Type": "multipart/form-data" },
           withCredentials: true,
-        }
+        },
       );
 
       if (res.data.success) {
@@ -104,7 +104,8 @@ const UpdateBlog = () => {
           <div>
             <h1 className="text-4xl font-bold">Edit Blog</h1>
             <p className="text-gray-600 dark:text-gray-300 mt-2">
-              Update your blog details below. Click <strong>Publish</strong> when ready.
+              Update your blog details below. Click <strong>Publish</strong>{" "}
+              when ready.
             </p>
           </div>
 
@@ -165,7 +166,10 @@ const UpdateBlog = () => {
           {/* Category */}
           <div className="mt-6">
             <Label className="mb-2">Category</Label>
-            <Select value={blogData.category} onValueChange={handleCategoryChange}>
+            <Select
+              value={blogData.category}
+              onValueChange={handleCategoryChange}
+            >
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>

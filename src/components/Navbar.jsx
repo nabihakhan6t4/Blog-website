@@ -152,8 +152,8 @@ const Navbar = () => {
                 <li
                   className={`py-1 md:py-0 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-all ${
                     location.pathname === link.path
-                      ? "text-blue-600 dark:text-blue-400 font-semibold"
-                      : "text-gray-700 dark:text-gray-200"
+  ? "text-blue-600 dark:text-blue-400 font-semibold border-b-2 border-blue-600"
+  : "text-gray-700 dark:text-gray-200"
                   }`}
                 >
                   {link.name}
@@ -189,7 +189,7 @@ const Navbar = () => {
                       <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => navigate("/dashboard/your-blog")}
+                     onClick={() => navigate("/dashboard/blogs")}
                     >
                       <ChartColumnBig />
                       <span>Your Blog</span>
@@ -203,10 +203,10 @@ const Navbar = () => {
                       <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => navigate("/dashboard/write-blog")}
+                     onClick={() => navigate("/dashboard/create-blog")}
                     >
                       <FaRegEdit />
-                      <span>Write Blog</span>
+                      <span>Create Blog</span>
                       <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>

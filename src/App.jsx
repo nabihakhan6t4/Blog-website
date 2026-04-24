@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/profile";
+import Profile from "./pages/Profile";
 import YourBlog from "./pages/YourBlog";
 import Comments from "./pages/Comments";
 import CreateBlog from "./pages/CreateBlog";

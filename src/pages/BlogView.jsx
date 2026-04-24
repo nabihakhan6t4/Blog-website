@@ -1,5 +1,5 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import {
@@ -12,7 +12,7 @@ import {
   BreadcrumbSeparator,
 } from "../components/ui/breadcrumb";
 import { toast } from "sonner";
-
+import axios from "axios";
 import { Button } from "../components/ui/button";
 import {
   DropdownMenu,
@@ -23,13 +23,19 @@ import {
 } from "../components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Badge } from "../components/ui/badge";
-import { FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { Bookmark, MessageSquare, Share2 } from "lucide-react";
+import { setBlog } from "../redux/blogSlice";
 const BlogView = () => {
   const params = useParams();
   const blogId = params.blogId;
+  const dispatch = useDispatch();
+  const { user } = useSelector((store) => store.auth);
   const { blog } = useSelector((store) => store.blog);
   const selectedBlog = blog.find((blog) => blog._id === blogId);
+  const isLiked = selectedBlog?.likes?.includes(user?._id);
+  const likeCount = selectedBlog?.likes?.length;
+
   console.log(selectedBlog);
   const formatDate = () => {
     if (!selectedBlog?.createdAt) return "";
@@ -62,15 +68,49 @@ const BlogView = () => {
     } else {
       // fallback copy to clipboard
       navigator.clipboard.writeText(blogUrl).then(() => {
-        toast.success("blog link copy to clipboard")
+        toast.success("blog link copy to clipboard");
       });
-      
+    }
+  };
+
+  const handleLikeToggle = async () => {
+    try {
+      const action = isLiked ? "unlike" : "like";
+      const method = isLiked ? "delete" : "post";
+
+      const res = await axios({
+        method,
+        url: `http://localhost:8000/api/v1/blog/${selectedBlog._id}/${action}`,
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        const updatedBlogData = blog.map((p) =>
+          p._id === selectedBlog._id
+            ? {
+                ...p,
+                likes: isLiked
+                  ? p.likes.filter((id) => id !== user._id)
+                  : [...p.likes, user._id],
+              }
+            : p,
+        );
+
+        dispatch(setBlog(updatedBlogData));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
     }
   };
 
   return (
-    <div className="pt-14 ">
-      <div className="max-w-6xl mx-auto p-10 ">
+  <div className="pt-14 bg-gray-50 dark:bg-gray-950 min-h-screen">
+    <div className="max-w-5xl mx-auto px-4 py-10">
+
+      {/* Breadcrumb */}
+      <div className="mb-6 text-sm">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -78,115 +118,124 @@ const BlogView = () => {
                 <Link to="/">Home</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
+
             <BreadcrumbSeparator />
 
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="">Blogs</Link>
+                <Link to="/blogs">Blogs</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
+
             <BreadcrumbSeparator />
+
             <BreadcrumbItem>
-              <BreadcrumbPage> {selectedBlog.title} </BreadcrumbPage>
+              <BreadcrumbPage className="text-gray-500">
+                {selectedBlog?.title}
+              </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+      </div>
 
-        {/* blog header */}
+      {/* Title */}
+      <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
+        {selectedBlog?.title}
+      </h1>
 
-        <div className="my-1 ">
-          <h1 className="text-4xl font-bold tracking-tight">
-            {" "}
-            {selectedBlog.title}{" "}
-          </h1>
-          <div className="flex items-center justify-between flex-wrap gap-4 ">
-            <div className="flex items-center space-x-4 ">
-              <Avatar>
-                <AvatarImage src={selectedBlog.author.photoUrl} alt="author" />
-                <AvatarFallback> NK </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="fon-medium">
-                  {selectedBlog.author.firstName}{" "}
-                  {selectedBlog.author.lastName}{" "}
-                </p>
-              </div>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">
-                Published on {formatDate()}
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* Author */}
+      <div className="flex items-center justify-between mt-6 flex-wrap gap-4">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={selectedBlog?.author?.photoUrl} />
+            <AvatarFallback>NK</AvatarFallback>
+          </Avatar>
 
-        {/* featured image */}
-
-        <div className="mb-8 rounded-lg overflow-hidden">
-          <img
-            src={selectedBlog.thumbnail}
-            alt="thumbnail"
-            width={1000}
-            height={500}
-            className="w-ful; object-cover"
-          />
-          <p className="text-sm text-muted-foreground mt-2 italic ">
-            {" "}
-            {selectedBlog.subtitle}{" "}
-          </p>
-        </div>
-
-        <p dangerouslySetInnerHTML={{ __html: selectedBlog.description }} />
-
-        <div className="mt-10">
-          <div className="flex flex-wrap gap-2 mb-8 ">
-            <Badge variant="secondary" className="dark:bg-gray-800">
-              {" "}
-              Next.js{" "}
-            </Badge>
-            <Badge variant="secondary" className="dark:bg-gray-800">
-              {" "}
-              React{" "}
-            </Badge>
-            <Badge variant="secondary" className="dark:bg-gray-800">
-              {" "}
-              Web Development{" "}
-            </Badge>
-            <Badge variant="secondary" className="dark:bg-gray-800">
-              {" "}
-              Javascript{" "}
-            </Badge>
-          </div>
-
-          {/* engagement */}
-          <div className="flex items-center justify-between border-y dark:border-gray-800  border-gray-300  py-4 mb-8  ">
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="flex items-center gap-1">
-                {" "}
-                <FaRegHeart
-                  size={24}
-                  className="cursor-pointer hover:text-gray-600 text-white "
-                />{" "}
-                <span> 0 </span>
-              </Button>
-              <Button variant="ghost">
-                <MessageSquare className="h-4 w-4" />
-                <span>1 comments</span>
-              </Button>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost">
-                <Bookmark className="w-4 h-4" />
-              </Button>
-              <Button onClick={handleShare} variant="ghost">
-                <Share2 className="w-4 h-4 " />
-              </Button>
-            </div>
+          <div>
+            <p className="font-medium text-gray-800 dark:text-gray-200">
+              {selectedBlog?.author?.firstName} {selectedBlog?.author?.lastName}
+            </p>
+            <p className="text-xs text-gray-500">
+              {formatDate()}
+            </p>
           </div>
         </div>
       </div>
+
+      {/* Thumbnail */}
+      <div className="mt-8 rounded-2xl overflow-hidden shadow-lg">
+        <img
+          src={selectedBlog?.thumbnail}
+          alt="thumbnail"
+          className="w-full h-[420px] object-cover hover:scale-105 transition duration-500"
+        />
+      </div>
+
+      {/* Subtitle */}
+      <p className="mt-4 text-gray-500 italic">
+        {selectedBlog?.subtitle}
+      </p>
+
+      {/* Content */}
+      <div className="prose dark:prose-invert max-w-none mt-10">
+        <div dangerouslySetInnerHTML={{ __html: selectedBlog?.description }} />
+      </div>
+
+      {/* Tags */}
+      <div className="mt-10 flex flex-wrap gap-2">
+        {["Next.js", "React", "Web Development", "JavaScript"].map((tag) => (
+          <Badge
+            key={tag}
+            className="rounded-full px-3 py-1 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200"
+          >
+            {tag}
+          </Badge>
+        ))}
+      </div>
+
+      {/* Actions */}
+      <div className="mt-8 flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-5">
+
+        <div className="flex items-center gap-4">
+
+          <button
+            onClick={handleLikeToggle}
+            className="flex items-center gap-2"
+          >
+            {isLiked ? (
+              <FaHeart className="text-red-500" size={20} />
+            ) : (
+              <FaRegHeart className="text-gray-400 hover:text-red-500" size={20} />
+            )}
+            <span className="text-sm">{likeCount}</span>
+          </button>
+
+          <button className="flex items-center gap-2 text-gray-500">
+            <MessageSquare size={18} />
+            <span className="text-sm">1 comment</span>
+          </button>
+
+        </div>
+
+        <div className="flex items-center gap-3">
+
+          <button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800">
+            <Bookmark size={18} />
+          </button>
+
+          <button
+            onClick={() => handleShare(selectedBlog._id)}
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
+          >
+            <Share2 size={18} />
+          </button>
+
+        </div>
+
+      </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default BlogView;

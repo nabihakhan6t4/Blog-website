@@ -12,7 +12,7 @@ const Sidebar = () => {
         <NavLink
           to="/dashboard/profile"
           className={({ isActive }) =>
-            `text-2xl px-4 py-2 rounded block ${
+            `text-base px-4 py-3 rounded-xl flex items-center gap-2 font-medium transition ${
               isActive
                 ? "bg-gray-800 dark:bg-gray-900 text-gray-200"
                 : "bg-transparent text-gray-700 dark:text-gray-300"
@@ -26,7 +26,7 @@ const Sidebar = () => {
         <NavLink
           to="/dashboard/blogs"
           className={({ isActive }) =>
-            `text-2xl px-4 py-2 rounded block ${
+            `text-base px-4 py-3 rounded-xl flex items-center gap-2 font-medium transition ${
               isActive
                 ? "bg-gray-800 dark:bg-gray-900 text-gray-200"
                 : "bg-transparent text-gray-700 dark:text-gray-300"
@@ -40,7 +40,7 @@ const Sidebar = () => {
         <NavLink
           to="/dashboard/comments"
           className={({ isActive }) =>
-            `text-2xl px-4 py-2 rounded block ${
+            `text-base px-4 py-3 rounded-xl flex items-center gap-2 font-medium transition ${
               isActive
                 ? "bg-gray-800 dark:bg-gray-900 text-gray-200"
                 : "bg-transparent text-gray-700 dark:text-gray-300"
@@ -54,7 +54,7 @@ const Sidebar = () => {
         <NavLink
           to="/dashboard/create-blog"
           className={({ isActive }) =>
-            `text-2xl px-4 py-2 rounded block ${
+            `text-base px-4 py-3 rounded-xl flex items-center gap-2 font-medium transition ${
               isActive
                 ? "bg-gray-800 dark:bg-gray-900 text-gray-200"
                 : "bg-transparent text-gray-700 dark:text-gray-300"

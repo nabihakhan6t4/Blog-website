@@ -8,9 +8,9 @@ const Hero = () => {
       <div className="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between min-h-[80vh] md:min-h-[600px] my-8 md:my-0">
         {/* 📝 Text Section */}
         <div className="text-center md:text-left max-w-xl mt-6 md:mt-0">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 leading-tight">
-            Explore the Latest Tech & Web Trends
-          </h1>
+         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 leading-tight">
+  Explore the Latest <span className="text-blue-600">Tech & Web Trends</span>
+</h1>
           <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg md:text-xl mb-6">
             Stay ahead with in-depth articles, tutorials, and insights on web
             development, digital marketing, and tech innovation.

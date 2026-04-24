@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setBlog } from "../redux/blogSlice";
 import { toast } from "sonner";
-import { setLoading } from "../redux/authSlice";
+import { setLoading } from "../redux/blogSlice";
 import { Loader2 } from "lucide-react";
 
 const CreateBlog = () => {
@@ -48,11 +48,12 @@ const CreateBlog = () => {
       );
 
       if (res.data.success) {
-        if (!blog) {
-          dispatch(setBlog([res.data.blog]));
-          toast.success(res.data.message);
-        }
-        dispatch(setBlog([...blog, res.data.blog]));
+       if (!blog || blog.length === 0) {
+  dispatch(setBlog([res.data.blog]));
+} else {
+  dispatch(setBlog([...blog, res.data.blog]));
+}
+       
         setTitle("");
         setCategory("");
         navigate(`/dashboard/create-blog/${res.data.blog._id}`);

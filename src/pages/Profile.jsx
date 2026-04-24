@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "../components/ui/card";
 import { Avatar, AvatarImage } from "../components/ui/avatar";
 import userLogo from "../assets/user.jpg";
@@ -26,20 +26,34 @@ import { Loader2 } from "lucide-react";
 
 const Profile = () => {
   const [open, setOpen] = useState(false);
-  const { user ,loading } = useSelector((store) => store.auth);
+  const { user, loading } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const [input, setInput] = useState({
-    firstName: user?.firstName,
-    lastName: user?.lastName,
-    occupation: user?.occupation,
-    bio: user?.bio,
-    facebook: user?.facebook,
-    linkedin: user?.linkedin,
-    github: user?.github,
-    instagram: user?.instagram,
-    file: user?.photoUrl,
+    firstName: "",
+    lastName: "",
+    occupation: "",
+    bio: "",
+    facebook: "",
+    linkedin: "",
+    github: "",
+    instagram: "",
+    file: "",
   });
-
+  useEffect(() => {
+    if (user) {
+      setInput({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        occupation: user.occupation || "",
+        bio: user.bio || "",
+        facebook: user.facebook || "",
+        linkedin: user.linkedin || "",
+        github: user.github || "",
+        instagram: user.instagram || "",
+        file: user.photoUrl || "",
+      });
+    }
+  }, [user]);
   const changeHandler = (e) => {
     const { name, value } = e.target;
     setInput((prev) => ({
@@ -76,7 +90,7 @@ const Profile = () => {
         {
           headers: { "Content-Type": "multipart/form-data" },
           withCredentials: true,
-        }
+        },
       );
       if (res.data.success) {
         setOpen(false);
@@ -106,16 +120,40 @@ const Profile = () => {
               {user.occupation || "Mern Stack Developer"}
             </h1>
             <div className="flex gap-4 items-center ">
-              <Link>
+              <Link to={user?.facebook} target="_blank">
                 <FaFacebook className="w-6 h-6 text-gray-800 dark:text-gray-300" />
               </Link>
-              <Link>
+              <Link
+                to={
+                  user?.linkedin?.startsWith("http")
+                    ? user.linkedin
+                    : `https://${user.linkedin}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <FaLinkedin className="w-6 h-6 text-gray-800 dark:text-gray-300" />
               </Link>
-              <Link>
+              <Link
+                to={
+                  user?.github?.startsWith("http")
+                    ? user.github
+                    : `https://${user.github}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <FaGithub className="w-6 h-6 text-gray-800 dark:text-gray-300" />
               </Link>
-              <Link>
+              <Link
+                to={
+                  user?.instagram?.startsWith("http")
+                    ? user.instagram
+                    : `https://${user.instagram}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <FaInstagram className="w-6 h-6 text-gray-800 dark:text-gray-300" />
               </Link>
             </div>
@@ -262,14 +300,14 @@ const Profile = () => {
                       onClick={submitHandler}
                       className="w-full sm:w-auto"
                     >
-                     {
-                      loading ? (
+                      {loading ? (
                         <>
-                        <Loader2 className="mr-2 w-4 h-4 animate-spin"/>
-                        Please Wait
+                          <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                          Please Wait
                         </>
-                      ) : ( "Save Changes")
-                     }
+                      ) : (
+                        "Save Changes"
+                      )}
                     </Button>
                   </DialogFooter>
                 </form>

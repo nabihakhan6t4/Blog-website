@@ -15,6 +15,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { setBlog } from "../redux/blogSlice";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { Button } from "../components/ui/button";
+import { toast } from "sonner";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -81,7 +83,7 @@ const YourBlog = () => {
           <Table>
             <TableCaption>List of your recent blog posts.</TableCaption>
             <TableHeader>
-              <TableRow>
+              <TableRow className="hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                 <TableHead scope="col">Title</TableHead>
                 <TableHead scope="col">Category</TableHead>
                 <TableHead scope="col">Date</TableHead>
@@ -94,17 +96,17 @@ const YourBlog = () => {
               {blog &&
                 blog.map((item, index) => (
                   <TableRow key={index}>
-                    <TableCell className="flex gap-4 items-center">
+                    <TableCell className="flex gap-3 items-center">
                       {item.thumbnail && (
                         <img
                           src={item.thumbnail}
                           alt=""
-                          className="w-20 rounded-md hidden md:block"
+                          className="w-16 h-12 object-cover rounded-md hidden md:block"
                         />
                       )}
                       <h1
                         onClick={() => navigate(`/blogs/${item._id}`)}
-                        className="hover:underline cursor-pointer"
+                        className="cursor-pointer font-medium hover:text-blue-600 transition"
                       >
                         {item.title}
                       </h1>
@@ -114,7 +116,7 @@ const YourBlog = () => {
 
                     <TableCell className="text-center">
                       <DropdownMenu>
-                        <DropdownMenuTrigger>
+                        <DropdownMenuTrigger className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
                           <BsThreeDotsVertical />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>

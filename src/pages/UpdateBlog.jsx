@@ -15,7 +15,7 @@ import {
 } from "../components/ui/select";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading } from "../redux/authSlice";
+import { setLoading } from "../redux/blogSlice";
 import axios from "axios";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -27,57 +27,61 @@ const UpdateBlog = () => {
   const dispatch = useDispatch();
 
   const { blog, loading } = useSelector((store) => store.blog);
-  const selectedBlog = blog.find((b) => b._id === blogId);
+  const selectedBlog = blog?.find((b) => b._id === blogId);
 
-  const [blogData, setBlogData] = useState({
+  const [formData, setFormData] = useState({
     title: selectedBlog?.title || "",
     subtitle: selectedBlog?.subtitle || "",
     description: selectedBlog?.description || "",
     category: selectedBlog?.category || "",
     thumbnail: selectedBlog?.thumbnail || "",
   });
-
-  const [thumbnailPreview, setThumbnailPreview] = useState(
+  const [isPublished, setIsPublished] = useState(
+    selectedBlog?.isPublished || false,
+  );
+  const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState(
     selectedBlog?.thumbnail || "",
   );
 
-  // Handle text input changes
-  const handleInputChange = (e) => {
+  if (!selectedBlog) return <p>Loading blog...</p>;
+
+  // Text input change
+  const handleTextInputChange = (e) => {
     const { name, value } = e.target;
-    setBlogData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle category selection
+  // Category change
   const handleCategoryChange = (value) => {
-    setBlogData((prev) => ({ ...prev, category: value }));
+    setFormData((prev) => ({ ...prev, category: value }));
   };
 
-  // Handle thumbnail file upload
-  const handleThumbnailChange = (e) => {
+  // Thumbnail upload
+  const handleThumbnailUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      setBlogData((prev) => ({ ...prev, thumbnail: file }));
-      setThumbnailPreview(URL.createObjectURL(file));
+      setFormData((prev) => ({ ...prev, thumbnail: file }));
+      setThumbnailPreviewUrl(URL.createObjectURL(file));
     }
   };
 
-  // Update blog handler
-  const updateBlogHandler = async () => {
-    const formData = new FormData();
-    formData.append("title", blogData.title);
-    formData.append("subtitle", blogData.subtitle);
-    formData.append("description", blogData.description);
-    formData.append("category", blogData.category);
+  // Update blog
+  const handleUpdateBlog = async () => {
+    const data = new FormData();
+    data.append("title", formData.title);
+    data.append("subtitle", formData.subtitle);
+    data.append("description", formData.description);
+    data.append("category", formData.category);
 
-    if (blogData.thumbnail instanceof File) {
-      formData.append("file", blogData.thumbnail);
+    if (formData.thumbnail instanceof File) {
+      data.append("file", formData.thumbnail);
     }
 
     try {
       dispatch(setLoading(true));
       const res = await axios.put(
         `http://localhost:8000/api/v1/blog/${blogId}`,
-        formData,
+        data,
         {
           headers: { "Content-Type": "multipart/form-data" },
           withCredentials: true,
@@ -86,13 +90,54 @@ const UpdateBlog = () => {
 
       if (res.data.success) {
         toast.success(res.data.message);
-        navigate(-1); // Navigate back after success
+        navigate(-1);
       }
     } catch (error) {
       console.error("Failed to update blog:", error);
       toast.error(error.response?.data?.message || "Failed to update blog");
     } finally {
       dispatch(setLoading(false));
+    }
+  };
+
+  // Toggle publish/unpublish
+  const handleTogglePublishStatus = async () => {
+    try {
+      const res = await axios.patch(
+        `http://localhost:8000/api/v1/blog/${blogId}/toggle-publish`,
+        {}, // no body needed if backend toggles internally
+        { withCredentials: true },
+      );
+
+      if (res.data.success) {
+        setIsPublished(!isPublished);
+        toast.success(res.data.message);
+      } else {
+        toast.error("Failed to update publish status");
+      }
+    } catch (error) {
+      console.error("Error updating publish status:", error);
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  };
+
+  // Delete blog
+  const handleDeleteBlog = async () => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:8000/api/v1/blog/delete/${blogId}`,
+        { withCredentials: true },
+      );
+
+      if (res.data.success) {
+        toast.success(res.data.message);
+        navigate("/dashboard/blogs");
+      } else {
+        toast.error("Failed to delete blog");
+      }
+    } catch (error) {
+      console.error("Failed to delete blog:", error);
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
   };
 
@@ -111,15 +156,11 @@ const UpdateBlog = () => {
 
           {/* Top Action Buttons */}
           <div className="flex flex-wrap gap-2 mt-4">
-            <Button
-              type="button"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={updateBlogHandler}
-              disabled={loading}
-            >
-              {loading ? "Updating..." : "Publish"}
+            <Button onClick={handleTogglePublishStatus} disabled={loading}>
+              {isPublished ? "Unpublish" : "Publish"}
             </Button>
-            <Button type="button" variant="destructive">
+
+            <Button variant="destructive" onClick={handleDeleteBlog}>
               Remove Blog
             </Button>
           </div>
@@ -131,8 +172,8 @@ const UpdateBlog = () => {
               type="text"
               placeholder="Enter blog title"
               name="title"
-              value={blogData.title}
-              onChange={handleInputChange}
+              value={formData.title}
+              onChange={handleTextInputChange}
               className="dark:border-gray-300"
             />
           </div>
@@ -144,8 +185,8 @@ const UpdateBlog = () => {
               type="text"
               placeholder="Enter blog subtitle"
               name="subtitle"
-              value={blogData.subtitle}
-              onChange={handleInputChange}
+              value={formData.subtitle}
+              onChange={handleTextInputChange}
               className="dark:border-gray-300"
             />
           </div>
@@ -155,9 +196,9 @@ const UpdateBlog = () => {
             <Label className="mb-1">Description</Label>
             <JoditEditor
               ref={editorRef}
-              value={blogData.description}
-              onChange={(newContent) =>
-                setBlogData((prev) => ({ ...prev, description: newContent }))
+              value={formData.description}
+              onChange={(content) =>
+                setFormData((prev) => ({ ...prev, description: content }))
               }
               className="jodit_toolbar mt-2"
             />
@@ -167,10 +208,10 @@ const UpdateBlog = () => {
           <div className="mt-6">
             <Label className="mb-2">Category</Label>
             <Select
-              value={blogData.category}
+              value={formData.category}
               onValueChange={handleCategoryChange}
             >
-              <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectTrigger className="w-full sm:w-45">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
@@ -193,11 +234,11 @@ const UpdateBlog = () => {
               type="file"
               className="w-fit dark:border-gray-300"
               accept="image/*"
-              onChange={handleThumbnailChange}
+              onChange={handleThumbnailUpload}
             />
-            {thumbnailPreview && (
+            {thumbnailPreviewUrl && (
               <img
-                src={thumbnailPreview}
+                src={thumbnailPreviewUrl}
                 alt="Thumbnail Preview"
                 className="w-64 my-2 object-cover rounded-md border"
               />
@@ -209,7 +250,7 @@ const UpdateBlog = () => {
             <Button variant="outline" onClick={() => navigate(-1)}>
               Back
             </Button>
-            <Button onClick={updateBlogHandler} disabled={loading}>
+            <Button onClick={handleUpdateBlog} disabled={loading}>
               {loading ? (
                 <div className="flex items-center">
                   <Loader2 className="mr-2 w-4 h-4 animate-spin" /> Please Wait

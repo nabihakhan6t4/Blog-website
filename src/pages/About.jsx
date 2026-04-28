@@ -50,8 +50,6 @@ const About = () => {
           <blockquote className="text-2xl text-gray-500 italic">
             “Words are powerful — use them to inspire.”
           </blockquote>
-
-         
         </div>
       </div>
     </div>

@@ -26,6 +26,7 @@ import { Badge } from "../components/ui/badge";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { Bookmark, MessageSquare, Share2 } from "lucide-react";
 import { setBlog } from "../redux/blogSlice";
+import CommentBox from "../components/CommentBox";
 const BlogView = () => {
   const params = useParams();
   const blogId = params.blogId;
@@ -233,6 +234,7 @@ const BlogView = () => {
         </div>
 
       </div>
+      <CommentBox selectedBlog={selectedBlog} />
     </div>
   </div>
 );
